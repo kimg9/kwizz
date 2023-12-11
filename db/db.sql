@@ -19,8 +19,8 @@ create table user_score (
 
 create table categories (
     cat_id                  int                 primary key generated always as identity,
-    cat_name                VARCHAR(124)        not null,
-    cat_short_name          VARCHAR(124)        not null,
+    cat_name                VARCHAR(124)        unique not null,
+    cat_short_name          VARCHAR(124)        unique not null,
     cat_description         text                not null,
     cat_image               text                not null           
 );
@@ -61,6 +61,9 @@ create table reponses (
 
 INSERT INTO users(pseudonym)
 VALUES ('Alain');
+
+INSERT INTO users(pseudonym)
+VALUES ('Nicolas');
 
 INSERT INTO categories(cat_name, cat_short_name, cat_description, cat_image)
 VALUES ('Culture Générale', 'culturegenerale', 'Entraine-toi sur des questions sur des sujets variés allant de l''histoire, à la politique, la géographie, etc.', '/public/cat_pic/culturegenerale.webp'),

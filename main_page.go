@@ -20,20 +20,18 @@ type Categorie struct {
 	Image       string
 }
 
-
-
 type Quizz struct {
 	Id               int
 	QuizzName        string
 	QuizzDescription string
+	Created_at       string
 	Quizz_CatID      int
 }
-
-var Quizzes []Categorie
 
 func check(err error) {
 	if err != nil {
 		log.Fatal(err)
+		// log.Fatalf("query error: %v\n", err)
 	}
 }
 
@@ -85,52 +83,49 @@ func main() {
 		})
 	})
 
-	//CATEGORIES
+	// CATEGORIES PAGE
+	app.Get("/categorie/:id", func(c *fiber.Ctx) error {
+		myCat := c.Params("id")
 
-	// Famille
+		var queryValue string
+		err := db.QueryRow("select count(*) != 0 from categories where cat_id = $1", myCat).Scan(&queryValue)
+		check(err)
 
-	// for cat := range Categories {
-	// 	if cat.Id =
-	// }
+		if queryValue != "true" {
+			return c.SendStatus(404)
+		}
 
-	// app.Get("/famille", func(c *fiber.Ctx) error {
+		var Quizzes []Quizz
 
-	// 	rows, err := db.Query("select * from quizzes")
-	// 	check(err)
-	// 	defer rows.Close()
+		rows, err := db.Query("select * from quizzes where cat_id = $1", myCat)
+		check(err)
+		defer rows.Close()
 
-	// 	for rows.Next() {
-	// 		var cat Quizzes
-	// 		err := rows.Scan(&cat.Id, &cat.Name, &cat.ShortName, &cat.Description, &cat.Image)
-	// 		check(err)
-	// 		Categories = append(Categories, cat)
-	// 	}
+		for rows.Next() {
+			var quizz Quizz
+			err := rows.Scan(&quizz.Id, &quizz.QuizzName, &quizz.QuizzDescription, &quizz.Created_at, &quizz.Quizz_CatID)
+			check(err)
+			Quizzes = append(Quizzes, quizz)
+		}
 
-	// 	return c.Render("categories/famille", fiber.Map{
-	// 		"Title": "Hello world",
-	// 	})
-	// })
+		err = rows.Err()
+		check(err)
 
-	// Culture Générale
-	// app.Get("/culturegenerale", func(c *fiber.Ctx) error {
-	// 	return c.Render("categories/culturegenerale", fiber.Map{
-	// 		"Title": "Hello world",
-	// 	})
-	// })
+		var CurrentCat string
+		errerr := db.QueryRow("select cat_name from categories where cat_id = $1", myCat).Scan(&CurrentCat)
+		check(errerr)
 
-	// // Mathématiques
-	// app.Get("/mathematiques", func(c *fiber.Ctx) error {
-	// 	return c.Render("categories/mathematiques", fiber.Map{
-	// 		"Title": "Hello world",
-	// 	})
-	// })
+		return c.Render("pages/categorie", fiber.Map{
+			"CurrentCat": CurrentCat,
+			"Quizzes":    Quizzes,
+		})
+	})
 
-	// // Français
-	// app.Get("/francais", func(c *fiber.Ctx) error {
-	// 	return c.Render("categories/francais", fiber.Map{
-	// 		"Title": "Hello world",
-	// 	})
-	// })
+	// QUIZZES PAGE
+	app.Get("/quizz/:id", func(c *fiber.Ctx) error {
+
+		return c.Render("pages/quizz", fiber.Map{})
+	})
 
 	// Renders CSS
 	app.Static("/assets/", "./assets")
