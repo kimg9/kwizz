@@ -84,49 +84,52 @@ func main() {
 		})
 	})
 
-	//FOOTER
-
 	//CATEGORIES
 
 	// Famille
-	app.Get("/famille", func(c *fiber.Ctx) error {
 
-		rows, err := db.Query("select * from quizzes")
-		check(err)
-		defer rows.Close()
+	// for cat := range Categories {
+	// 	if cat.Id =
+	// }
 
-		for rows.Next() {
-			var cat Quizzes
-			err := rows.Scan(&cat.Id, &cat.Name, &cat.ShortName, &cat.Description, &cat.Image)
-			check(err)
-			Categories = append(Categories, cat)
-		}
+	// app.Get("/famille", func(c *fiber.Ctx) error {
 
-		return c.Render("categories/famille", fiber.Map{
-			"Title": "Hello world",
-		})
-	})
+	// 	rows, err := db.Query("select * from quizzes")
+	// 	check(err)
+	// 	defer rows.Close()
+
+	// 	for rows.Next() {
+	// 		var cat Quizzes
+	// 		err := rows.Scan(&cat.Id, &cat.Name, &cat.ShortName, &cat.Description, &cat.Image)
+	// 		check(err)
+	// 		Categories = append(Categories, cat)
+	// 	}
+
+	// 	return c.Render("categories/famille", fiber.Map{
+	// 		"Title": "Hello world",
+	// 	})
+	// })
 
 	// Culture Générale
-	app.Get("/culturegenerale", func(c *fiber.Ctx) error {
-		return c.Render("categories/culturegenerale", fiber.Map{
-			"Title": "Hello world",
-		})
-	})
+	// app.Get("/culturegenerale", func(c *fiber.Ctx) error {
+	// 	return c.Render("categories/culturegenerale", fiber.Map{
+	// 		"Title": "Hello world",
+	// 	})
+	// })
 
-	// Mathématiques
-	app.Get("/mathematiques", func(c *fiber.Ctx) error {
-		return c.Render("categories/mathematiques", fiber.Map{
-			"Title": "Hello world",
-		})
-	})
+	// // Mathématiques
+	// app.Get("/mathematiques", func(c *fiber.Ctx) error {
+	// 	return c.Render("categories/mathematiques", fiber.Map{
+	// 		"Title": "Hello world",
+	// 	})
+	// })
 
-	// Français
-	app.Get("/francais", func(c *fiber.Ctx) error {
-		return c.Render("categories/francais", fiber.Map{
-			"Title": "Hello world",
-		})
-	})
+	// // Français
+	// app.Get("/francais", func(c *fiber.Ctx) error {
+	// 	return c.Render("categories/francais", fiber.Map{
+	// 		"Title": "Hello world",
+	// 	})
+	// })
 
 	// Renders CSS
 	app.Static("/assets/", "./assets")
