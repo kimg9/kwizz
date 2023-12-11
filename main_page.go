@@ -20,7 +20,7 @@ type Categorie struct {
 	Image       string
 }
 
-var Categories []Categorie
+
 
 type Quizz struct {
 	Id               int
@@ -59,6 +59,7 @@ func main() {
 
 	// HOME PAGE
 	app.Get("/", func(c *fiber.Ctx) error {
+		var Categories []Categorie
 		var pseudonym string
 		err := db.QueryRow("select pseudonym from users").Scan(&pseudonym)
 		check(err)
