@@ -24,17 +24,21 @@
         </div>
     </div>
 
-    {{range .Questions}}
+    {{range .Happy_couples}}
     <div>
-        <h4>{{.Question}}</h4>
-        {{range .Responses}}
-        {{if eq .Questions.Question_ID .Responses.Question_ID}}
+        <h4>{{index .Happy_couples 3}}</h4>
         <label>
             <input type="checkbox" value="html" id="html" />
-            {{.Response}}
+            {{index .Happy_couples 0}}
         </label> 
-        {{end}}
-        {{end}}
+        <label>
+            <input type="checkbox" value="html" id="html" />
+            {{index .Happy_couples 1}}
+        </label> 
+        <label>
+            <input type="checkbox" value="html" id="html" />
+            {{index .Happy_couples 2}}
+        </label> 
     </div>
     {{end}}
     

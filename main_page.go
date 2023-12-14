@@ -30,19 +30,26 @@ type Quizz struct {
 }
 
 type Question struct {
-	Question_ID int
-	Quizz_ID    int
-	Question    string
+	Q_Question_ID int
+	Quizz_ID      int
+	Question      string
 	// Response        string
 	Order_questions *int
 }
 
 type Response struct {
-	Response_ID int
-	Question_ID int
+	Response_ID   int
+	R_Question_ID int
 	// Session_ID  int
 	Answer    string
-	isCorrect bool
+	isCorrect *bool
+}
+
+type HappyCouples struct {
+	AnswerOne   string
+	AnswerTwo   string
+	AnswerThree *string
+	Question    string
 }
 
 func check(err error) {
@@ -160,11 +167,11 @@ func main() {
 
 		rows, err := db.Query("select * from questions where quizz_id = $1", myQuizz)
 		check(err)
-		defer rows.Close()
+		// defer rows.Close()
 
 		for rows.Next() {
 			var question Question
-			err := rows.Scan(&question.Question_ID, &question.Quizz_ID, &question.Question, &question.Order_questions)
+			err := rows.Scan(&question.Q_Question_ID, &question.Quizz_ID, &question.Question, &question.Order_questions)
 			check(err)
 			Questions = append(Questions, question)
 		}
@@ -177,15 +184,32 @@ func main() {
 
 		for otherRows.Next() {
 			var response Response
-			err := rows.Scan(&response.Response_ID, &response.Question_ID, &response.Answer, &response.isCorrect)
+			err := otherRows.Scan(&response.Response_ID, &response.R_Question_ID, &response.Answer, &response.isCorrect)
 			check(err)
 			Responses = append(Responses, response)
 		}
 
+		var Happy_couples []HappyCouples
+
+		for _, q := range Questions {
+			var Happy_couple HappyCouples
+			for _, r := range Responses {
+				if q.Q_Question_ID == r.R_Question_ID {
+					Happy_couple = append(Happy_couple, r.Answer)
+				}
+			}
+			Happy_couples = append(Happy_couples, q.Question)
+		}
+
+		fmt.Print(Happy_couples)
+
+		// otherRows.Close()
+
 		return c.Render("pages/session", fiber.Map{
 			// "Answers":   Split_answers,
-			"Questions": Questions,
-			"Responses": Responses,
+			"Happy_couples": Happy_couples,
+			"Questions":     Questions,
+			"Responses":     Responses,
 		})
 	})
 

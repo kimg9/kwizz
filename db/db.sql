@@ -37,7 +37,6 @@ create table questions (
     question_id             int                 primary key generated always as identity,
     quizz_id                int                 references quizzes(quizz_id) not null,
     question                text                not null,
-    -- responses_id            int[]               references responses_id,
     order_questions         smallint
 );
 
