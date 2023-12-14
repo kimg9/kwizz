@@ -37,22 +37,23 @@ create table questions (
     question_id             int                 primary key generated always as identity,
     quizz_id                int                 references quizzes(quizz_id) not null,
     question                text                not null,
-    response                text                not null,
+    -- responses_id            int[]               references responses_id,
     order_questions         smallint
 );
 
 create table quizz_sessions (
     session_id             INT                  primary key generated always as identity,
     quizz_id               INT                  references quizzes(quizz_id) not null,
-    user_id                INT                  references users(user_id) not null,
+    -- user_id                INT                  references users(user_id) not null,
     finished               bool                 not null default false,
     score                  INT                  not null default '0'
 );
 
-create table reponses (
+create table responses (
     responses_id           int                  primary key generated always as identity,
     question_id            INT                  references questions(question_id),
-    session_id             INT                  references quizz_sessions(session_id),
+    -- session_id             INT                  references quizz_sessions(session_id),
+    answer                 text                 not null,
     isCorrect              bool
 );
 
@@ -76,3 +77,19 @@ INSERT INTO quizzes(quizz_title, quizz_description, cat_id)
 VALUES ('Les anniversaires', 'Seras-tu capable de te souvenir des anniversaires des membres de la famille ?', '4'),
 ('Les voyages', 'Sauras-tu te souvenir de tous les lieux qu''on a visité ?', '4'),
 ('Les déménagements', 'On est une famille de voyageurs, sauras-tu retrouver tous les déménagements qu''on a fait ?', '4');
+
+INSERT INTO questions(quizz_id, question)
+VALUES ('1', 'Quel est l''anniversaire de Kim ?'),
+('1', 'Quel est l''anniversaire de Véronique ?'),
+('1', 'Quel est l''anniversaire de Jérôme et Jenny ?');
+
+INSERT INTO responses(question_id, answer)
+VALUES ('1', '19 octobre'),
+('1', '17 octobre'),
+('1', '18 octobre'),
+('2', '19 mai'),
+('2', '18 mai'),
+('2', '17 mai'),
+('3', '25 janvier'),
+('3', '26 janvier'),
+('3', '27 janvier');

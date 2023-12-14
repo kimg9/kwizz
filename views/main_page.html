@@ -32,11 +32,11 @@
         <div class ="cards">
 
             {{range .Categories}}
-            <a href="/categorie/{{.Id}}">
+            <a href="/categorie/{{.Cat_Id}}">
                 <div class="card">
-                    <img class ="cat_img" alt="{{.Name}}" src="/public/cat_pic/{{.ShortName}}.webp"/>
-                    <h4>{{.Name}}</h4>
-                    <p>{{.Description}}</p>
+                    <img class ="cat_img" alt="{{.Cat_Name}}" src="/public/cat_pic/{{.Cat_ShortName}}.webp"/>
+                    <h4>{{.Cat_Name}}</h4>
+                    <p>{{.Cat_Description}}</p>
                 </div>
             </a>
             {{end}}
@@ -58,7 +58,7 @@
             <p class="textarea">SCORE TOTAL:</p>
             <p class="textarea">SCORE PAR CATÉGORIE: </br>
                 {{range .Categories}}
-                * {{.Name}} :</br>
+                * {{.Cat_Name}} :</br>
                 {{end}}
             </p>
 

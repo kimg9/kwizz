@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	D "kwizz/functions"
@@ -13,25 +14,40 @@ import (
 var db *sql.DB
 
 type Categorie struct {
-	Id          int
-	ShortName   string
-	Name        string
-	Description string
-	Image       string
+	Cat_Id          int
+	Cat_ShortName   string
+	Cat_Name        string
+	Cat_Description string
+	Cat_Image       string
 }
 
 type Quizz struct {
-	Id               int
-	QuizzName        string
-	QuizzDescription string
-	Created_at       string
-	Quizz_CatID      int
+	Quizz_Id          int
+	Quizz_Name        string
+	Quizz_Description string
+	Created_at        string
+	Quizz_CatID       int
+}
+
+type Question struct {
+	Question_ID int
+	Quizz_ID    int
+	Question    string
+	// Response        string
+	Order_questions *int
+}
+
+type Response struct {
+	Response_ID int
+	Question_ID int
+	// Session_ID  int
+	Answer    string
+	isCorrect bool
 }
 
 func check(err error) {
 	if err != nil {
 		log.Fatal(err)
-		// log.Fatalf("query error: %v\n", err)
 	}
 }
 
@@ -68,7 +84,7 @@ func main() {
 
 		for rows.Next() {
 			var cat Categorie
-			err := rows.Scan(&cat.Id, &cat.Name, &cat.ShortName, &cat.Description, &cat.Image)
+			err := rows.Scan(&cat.Cat_Id, &cat.Cat_Name, &cat.Cat_ShortName, &cat.Cat_Description, &cat.Cat_Image)
 			check(err)
 			Categories = append(Categories, cat)
 		}
@@ -103,7 +119,7 @@ func main() {
 
 		for rows.Next() {
 			var quizz Quizz
-			err := rows.Scan(&quizz.Id, &quizz.QuizzName, &quizz.QuizzDescription, &quizz.Created_at, &quizz.Quizz_CatID)
+			err := rows.Scan(&quizz.Quizz_Id, &quizz.Quizz_Name, &quizz.Quizz_Description, &quizz.Created_at, &quizz.Quizz_CatID)
 			check(err)
 			Quizzes = append(Quizzes, quizz)
 		}
@@ -123,8 +139,54 @@ func main() {
 
 	// QUIZZES PAGE
 	app.Get("/quizz/:id", func(c *fiber.Ctx) error {
+		myQuizz := c.Params("id")
 
-		return c.Render("pages/quizz", fiber.Map{})
+		id := 0
+		err := db.QueryRow(`Insert into quizz_sessions(quizz_id) values ($1) returning session_id`, myQuizz).Scan(&id)
+		check(err)
+
+		url := fmt.Sprintf("/session/%s/%d", myQuizz, id)
+
+		return c.Redirect(url)
+
+	})
+
+	// ACTIVE SESSION PAGE
+	app.Get("/session/:quizz_id/:session_id", func(c *fiber.Ctx) error {
+		myQuizz := c.Params("quizz_id")
+		// mySession := c.Params("session_id")
+
+		var Questions []Question
+
+		rows, err := db.Query("select * from questions where quizz_id = $1", myQuizz)
+		check(err)
+		defer rows.Close()
+
+		for rows.Next() {
+			var question Question
+			err := rows.Scan(&question.Question_ID, &question.Quizz_ID, &question.Question, &question.Order_questions)
+			check(err)
+			Questions = append(Questions, question)
+		}
+
+		var Responses []Response
+
+		otherRows, err := db.Query("select * from responses")
+		check(err)
+		defer otherRows.Close()
+
+		for otherRows.Next() {
+			var response Response
+			err := rows.Scan(&response.Response_ID, &response.Question_ID, &response.Answer, &response.isCorrect)
+			check(err)
+			Responses = append(Responses, response)
+		}
+
+		return c.Render("pages/session", fiber.Map{
+			// "Answers":   Split_answers,
+			"Questions": Questions,
+			"Responses": Responses,
+		})
 	})
 
 	// Renders CSS
