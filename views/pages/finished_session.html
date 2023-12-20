@@ -13,7 +13,7 @@
 <body>
     {{template "layouts/header" .}}
 
-    
+   
     <div class="section">
         <div class="titles">
             <div class="title_box">
@@ -26,11 +26,23 @@
     </div>
 
     <div class="section">
+        <h2>BRAVO !! Ce quizz est maintenant terminé !!</h2>
+        <h2>Votre dernier score à ce quizz est : {{.Score}}</h2>
+    </div>
+
+    <form action ="" method="post">
+        <input type="hidden" value="redo" id="redo" name="redo"/>
+
+    <div class="section">
+        <button class="submit_button" type="submit">Je veux refaire ce quizz</button>
+    </div>
+
+    </form>
+
     
-    <form class="form" action ="" method="post">
         {{range .HappyCouples}}
             <h4>{{.TheQuestion.Question}}</h4>
-            <div class = "response">
+            <div>
                 {{range .TheResponses}}
                 <input type="radio" value="{{ .Response_ID}}" id="Quest{{ .R_Question_ID}}" name="{{ .R_Question_ID}}" required/>
                     <label for="ChoiceNumber{{.Response_ID}}">
@@ -40,11 +52,8 @@
             </div>
 
         {{end}}
-        <div class="section">
-            <button class="submit_button" type="submit">Envoyer</button>
-        </div>
-    </form>
-    </div>
+
+
     
     {{template "layouts/footer" .}}
 
