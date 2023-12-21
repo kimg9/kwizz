@@ -32,28 +32,30 @@
 
     <form action ="" method="post">
         <input type="hidden" value="redo" id="redo" name="redo"/>
-
-    <div class="section">
-        <button class="submit_button" type="submit">Je veux refaire ce quizz</button>
-    </div>
-
+        <div class="section">
+            <button class="submit_button" type="submit">Je veux refaire ce quizz</button>
+        </div>
     </form>
 
-    
-        {{range .HappyCouples}}
-            <h4>{{.TheQuestion.Question}}</h4>
-            <div>
-                {{range .TheResponses}}
-                <input type="radio" value="{{ .Response_ID}}" id="Quest{{ .R_Question_ID}}" name="{{ .R_Question_ID}}" required/>
-                    <label for="ChoiceNumber{{.Response_ID}}">
-                        {{ .Answer}}
+    <div class="section">
+        <form class="form" action ="" method="post">
+            {{range $i2, $q := .View}}
+            <h4>
+                {{.V_Question}}
+            </h4>
+            <div class = "response">
+                {{range $i, $a := .V_Answer}}
+                <div>
+                    <label for="{{ index $q.V_Response_ID $i }}">
+                        <input type="radio" value="{{ index $q.V_Response_ID $i}}" id="{{ index $q.V_Response_ID $i}}" name="{{ $q.V_Question_ID}}" required/>
+                        {{ index $q.V_Answer $i}}
                     </label> 
+                </div>
                 {{end}}
             </div>
-
-        {{end}}
-
-
+            {{end}}
+        </form>
+    </div>
     
     {{template "layouts/footer" .}}
 

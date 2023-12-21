@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"runtime"
 
 	D "kwizz/functions"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
+	"github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -48,10 +50,23 @@ type HappyCouple struct {
 	TheResponses []Response
 }
 
-func check(err error) {
+type ViewSelectedQuestion struct {
+	Session_ID    int
+	V_Question_ID int
+	V_Question    string
+	V_Response_ID []int32
+	V_Answer      []string
+	V_isCorrrect  []bool
+	Selected      []bool
+}
+
+func check(err error) (b bool) {
 	if err != nil {
-		log.Fatal(err)
+		_, filename, line, _ := runtime.Caller(1)
+		log.Printf("[error] %s:%d %v", filename, line, err)
+		b = true
 	}
+	return
 }
 
 func newSession(myQuizz string) int {
@@ -88,7 +103,7 @@ func main() {
 		err := db.QueryRow("select pseudonym from users").Scan(&pseudonym)
 		check(err)
 
-		rows, err := db.Query("select * from categories")
+		rows, err := db.Query("select cat_id, cat_name, cat_short_name, cat_description, cat_image from categories")
 		check(err)
 		defer rows.Close()
 
@@ -102,10 +117,15 @@ func main() {
 		err = rows.Err()
 		check(err)
 
+		var Score string
+		err = db.QueryRow("select coalesce((select sum(score) from quizz_sessions where user_id = 1), 0)").Scan(&Score)
+		check(err)
+
 		// Render index template
 		return c.Render("main_page", fiber.Map{
 			"Pseudonym":  pseudonym,
 			"Categories": Categories,
+			"Score":      Score,
 		})
 	})
 
@@ -123,7 +143,7 @@ func main() {
 
 		var Quizzes []Quizz
 
-		rows, err := db.Query("select * from quizzes where cat_id = $1", myCat)
+		rows, err := db.Query("select quizz_id, quizz_title, quizz_description, created_at, cat_id from quizzes where cat_id = $1", myCat)
 		check(err)
 		defer rows.Close()
 
@@ -180,21 +200,6 @@ func main() {
 		myQuizz := c.Params("quizz_id")
 		mySession := c.Params("session_id")
 
-		// Get questions that will be rendered in HTML
-		var Questions []Question
-
-		rows, err := db.Query("select * from questions where quizz_id = $1", myQuizz)
-		check(err)
-		defer rows.Close()
-
-		for rows.Next() {
-			var question Question
-			err := rows.Scan(&question.Q_Question_ID, &question.Quizz_ID, &question.Question, &question.Order_questions)
-			check(err)
-			Questions = append(Questions, question)
-		}
-
-		// Get answers : two different cases whether the quizz was already completed or not
 		var finished bool
 		errerr := db.QueryRow(`select finished from quizz_sessions where session_id = $1`, mySession).Scan(&finished)
 		check(errerr)
@@ -205,44 +210,47 @@ func main() {
 			errerr := db.QueryRow(`select score from quizz_sessions where session_id = $1`, mySession).Scan(&Score)
 			check(errerr)
 
-			// for _, q := range Questions {
-			// 	var respID int
-			// 	var questID int
-			// 	var answer string
-			// 	var isCorrect bool
+			var ViewSelectedQuestions []ViewSelectedQuestion
+			rows, err := db.Query("select session_id, question_id, question, response_ids, answers, isCorrects, selected from v_selected_questions where session_id = $1", mySession)
+			check(err)
+			defer rows.Close()
 
-			// 	otherRows, err := db.Query("select * from responses where question_id = $1", q.Q_Question_ID)
-			// 	check(err)
-			// 	defer otherRows.Close()
+			for rows.Next() {
+				var view ViewSelectedQuestion
+				err := rows.Scan(&view.Session_ID, &view.V_Question_ID, &view.V_Question, (*pq.Int32Array)(&view.V_Response_ID), (*pq.StringArray)(&view.V_Answer), (*pq.BoolArray)(&view.V_isCorrrect), (*pq.BoolArray)(&view.Selected))
+				check(err)
+				ViewSelectedQuestions = append(ViewSelectedQuestions, view)
+			}
 
-			// 	for otherRows.Next() {
-			// 		var response Response
-			// 		err := otherRows.Scan(&response.Response_ID, &response.R_Question_ID, &response.Answer, &response.isCorrect)
-			// 		check(err)
-			// 		Responses = append(Responses, response)
-			// 	}
-
-			// 	var happyCouple HappyCouple
-			// 	happyCouple.TheQuestion = q
-			// 	happyCouple.TheResponses = Responses
-
-			// 	HappyCouples = append(HappyCouples, happyCouple)
-
-			// }
+			// fmt.Println(ViewSelectedQuestions)
 
 			return c.Render("pages/finished_session", fiber.Map{
 				"Score": Score,
+				"View":  ViewSelectedQuestions,
 			})
 
 		}
 
 		// CASE 2 : first time taking quizz
+		var Questions []Question
+
+		rows, err := db.Query("select question_id, quizz_id, question, order_questions from questions where quizz_id = $1", myQuizz)
+		check(err)
+		defer rows.Close()
+
+		for rows.Next() {
+			var question Question
+			err := rows.Scan(&question.Q_Question_ID, &question.Quizz_ID, &question.Question, &question.Order_questions)
+			check(err)
+			Questions = append(Questions, question)
+		}
+
 		var HappyCouples []HappyCouple
 
 		for _, q := range Questions {
 			var Responses []Response
 
-			otherRows, err := db.Query("select * from responses where question_id = $1", q.Q_Question_ID)
+			otherRows, err := db.Query("select response_id, question_id, answer, isCorrect  from responses where question_id = $1", q.Q_Question_ID)
 			check(err)
 			defer otherRows.Close()
 
@@ -332,6 +340,6 @@ func main() {
 	app.Static("/public/", "./public")
 
 	// Open port to listen to
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":19000"))
 
 }

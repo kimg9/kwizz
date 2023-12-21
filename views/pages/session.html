@@ -26,24 +26,26 @@
     </div>
 
     <div class="section">
-    
-    <form class="form" action ="" method="post">
-        {{range .HappyCouples}}
-            <h4>{{.TheQuestion.Question}}</h4>
+        <form class="form" action ="" method="post">
+            {{range .HappyCouples}}
+            <h4>
+                {{.TheQuestion.Question}}
+            </h4>
             <div class = "response">
                 {{range .TheResponses}}
-                <input type="radio" value="{{ .Response_ID}}" id="Quest{{ .R_Question_ID}}" name="{{ .R_Question_ID}}" required/>
-                    <label for="ChoiceNumber{{.Response_ID}}">
+                <div>
+                    <label for="{{ .Response_ID}}">
+                        <input type="radio" value="{{ .Response_ID}}" id="{{ .Response_ID}}" name="{{ .R_Question_ID}}" required/>
                         {{ .Answer}}
                     </label> 
+                </div>
                 {{end}}
             </div>
-
-        {{end}}
-        <div class="section">
-            <button class="submit_button" type="submit">Envoyer</button>
-        </div>
-    </form>
+            {{end}}
+            <div class="section">
+                <button class="submit_button" type="submit">Envoyer</button>
+            </div>
+        </form>
     </div>
     
     {{template "layouts/footer" .}}
