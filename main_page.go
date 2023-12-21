@@ -85,13 +85,6 @@ func main() {
 	// Start app
 	engine := html.New("./views", ".html")
 
-	// Add unescape function to allow innerHTML
-	// engine.AddFunc(
-	// 	"unescape", func(s string) template.HTML {
-	// 		return template.HTML(s)
-	// 	},
-	// )
-
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
@@ -281,9 +274,7 @@ func main() {
 
 		// If user asks to redo the quizz, new session is created
 		if c.FormValue("redo") != "" {
-			// id := 0
-			// err := db.QueryRow(`Insert into quizz_sessions(quizz_id) values ($1) returning session_id`, myQuizz).Scan(&id)
-			// check(err)
+
 			id := newSession(myQuizz)
 
 			url := fmt.Sprintf("/session/%s/%d", myQuizz, id)
@@ -302,6 +293,7 @@ func main() {
 			check(err)
 
 			value := c.FormValue(QuestionID)
+			fmt.Println(value)
 
 			var isCorrect bool
 			errerr := db.QueryRow(`select iscorrect from responses where response_id = $1`, value).Scan(&isCorrect)
@@ -314,7 +306,7 @@ func main() {
 			}
 
 			//Store answers
-			_, errStore := db.Exec(`insert into sess_resp(session_id, response_id) values ($1, $2)`, mySession, QuestionID)
+			_, errStore := db.Exec(`insert into sess_resp(session_id, response_id) values ($1, $2)`, mySession, value)
 			check(errStore)
 
 		}
@@ -322,12 +314,6 @@ func main() {
 		//Set session to finish
 		_, err = db.Exec(`update quizz_sessions set finished = true where session_id = $1`, mySession)
 		check(err)
-
-		//Update general score
-		// _, err = db.Exec(`insert into user_score(user_id, total_score) values quizz_sessions('1', score) where session_id = $1`, mySession)
-		// check(err)
-
-		//TODO:update general score in leader board
 
 		url := fmt.Sprintf("/session/%s/%s", myQuizz, mySession)
 		return c.Redirect(url)

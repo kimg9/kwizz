@@ -25,17 +25,24 @@
         </div>
     </div>
 
-    <div class="section">
-        <h2>BRAVO !! Ce quizz est maintenant terminé !!</h2>
-        <h2>Votre dernier score à ce quizz est : {{.Score}}</h2>
-    </div>
+    <div class="shade blackboard">
+        <h2 class ="textarea">BRAVO ! </br>
+            Ce quizz est maintenant terminé.</h2>
+        <h2 class ="textarea">Score : {{.Score}}</h2>
 
-    <form action ="" method="post">
-        <input type="hidden" value="redo" id="redo" name="redo"/>
         <div class="section">
-            <button class="submit_button" type="submit">Je veux refaire ce quizz</button>
+            <div class="subsection">
+                <form action ="" method="post">
+                    <input type="hidden" value="redo" id="redo" name="redo"/>
+                        <button class="submit_button" type="submit">Je veux refaire ce quizz</button>
+                </form>
+
+                <a href="/">
+                <button class="submit_button" type="submit">Retour à la page principale</button>
+                </a>
+            </div>
         </div>
-    </form>
+    </div>
 
     <div class="section">
         <form class="form" action ="" method="post">
@@ -44,11 +51,22 @@
                 {{.V_Question}}
             </h4>
             <div class = "response">
-                {{range $i, $a := .V_Answer}}
+                {{range $i, $a := .V_Response_ID}}
                 <div>
-                    <label for="{{ index $q.V_Response_ID $i }}">
-                        <input type="radio" value="{{ index $q.V_Response_ID $i}}" id="{{ index $q.V_Response_ID $i}}" name="{{ $q.V_Question_ID}}" required/>
-                        {{ index $q.V_Answer $i}}
+                    <label 
+        
+                    {{ if (index $q.V_isCorrrect $i)}} 
+                        class = "green"
+                    {{end}}
+
+                    {{ if and (not (index $q.V_isCorrrect $i)) (index $q.Selected $i)}} 
+                        class ="red"
+                    {{end}}
+
+                    for="{{ index $q.V_Response_ID $i }}">
+                        <input type="radio" value="{{ index $q.V_Response_ID $i}}" id="{{ index $q.V_Response_ID $i}}" name="{{ $q.V_Question_ID}}" required {{ if (index $q.Selected $i)}} checked {{end}}/>
+                        {{ index $q.V_Answer $i}} 
+                        {{ if and (index $q.V_isCorrrect $i) (index $q.Selected $i)}}✓{{end}}
                     </label> 
                 </div>
                 {{end}}
@@ -61,3 +79,4 @@
 
 </body>
 </html>
+

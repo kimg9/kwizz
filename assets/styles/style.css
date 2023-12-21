@@ -29,6 +29,19 @@ a:visited{
   /* padding-bottom: 40px; */
 }
 
+.subsection{
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  padding-bottom: 40px;
+}
+
+hr.solid {
+  border-top: 2px solid #000;
+  width: 500px;
+  margin-top: 40px;
+}
+
 /* TITLES */
 
 .titles{
@@ -147,6 +160,7 @@ h2 {
 
 .category{
   background-color: #3ea66b;
+  padding-bottom: 40px;
 }
 
 .cards {
@@ -156,7 +170,7 @@ h2 {
   grid-auto-rows: 1fr;
   grid-auto-columns: 1fr;
   grid-column-gap: 10px;
-  grid-row-gap: 80px;
+  grid-row-gap: 30px;
   margin-top: 25px;
 }
 
@@ -164,13 +178,17 @@ h2 {
   background-color: #fffbe0;
   border: solid #000;
   border-width: 1px;
-  padding: 10px 10px 10px 10px;
+  padding: 10px 10px 5px 10px;
   width: 300px;
   text-align: center;
   overflow: hidden;
   color:#000;
-  justify-self: stretch;
   height: 100%;
+}
+
+.card p{
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .cat_img {
@@ -291,6 +309,17 @@ h2 {
   /* display: flex;
   justify-content: space-evenly; */
 
+}
+
+.green {
+  color:#3ea66b;
+  font-weight: 700;
+}
+
+.red {
+  color:#FF6953;
+  font-weight: 600;
+  text-decoration: line-through;
 }
 
 .submit_button {
