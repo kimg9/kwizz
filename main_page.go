@@ -289,11 +289,11 @@ func main() {
 
 		for i := 0; i < count; i++ {
 			var QuestionID string
-			err := db.QueryRow(`select question_id from questions where quizz_id = 1 order by question_id offset $1 limit 1`, i).Scan(&QuestionID)
+			err := db.QueryRow(`select question_id from questions where quizz_id = $1 order by question_id offset $2 limit 1`, myQuizz, i).Scan(&QuestionID)
 			check(err)
 
 			value := c.FormValue(QuestionID)
-			fmt.Println(value)
+			// fmt.Println(value)
 
 			var isCorrect bool
 			errerr := db.QueryRow(`select iscorrect from responses where response_id = $1`, value).Scan(&isCorrect)

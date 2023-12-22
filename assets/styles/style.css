@@ -26,14 +26,14 @@ a:visited{
   flex-direction: column;
   align-items: center;
   padding-top: 40px;
-  /* padding-bottom: 40px; */
+  height: 100%;
 }
 
 .subsection{
   display: flex;
   flex-direction: row;
   gap: 50px;
-  padding-bottom: 40px;
+  /* padding-bottom: 40px; */
 }
 
 hr.solid {
@@ -214,7 +214,7 @@ h2 {
 .blackboard {
     position: relative;
     width: 640px;
-    margin: 7% auto;
+    margin: 3% auto;
     border: tan solid 12px;
     border-top: #bda27e solid 12px;
     border-left: #b19876 solid 12px;
@@ -303,12 +303,22 @@ h2 {
   margin-bottom: 10px;
 }
 
+/* .block {
+  position: relative;
+}
+
+.block input:checked ~ i {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index: 1;
+ } */
+
 .response {
   margin-top: 0px;
   margin-bottom: 50px;
-  /* display: flex;
-  justify-content: space-evenly; */
-
 }
 
 .green {
@@ -345,5 +355,4 @@ h2 {
   justify-content: flex-end;
   flex-direction: column;
   align-items: flex-end;
-  
 }

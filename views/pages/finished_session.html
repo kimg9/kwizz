@@ -47,33 +47,45 @@
     <div class="section">
         <form class="form" action ="" method="post">
             {{range $i2, $q := .View}}
-            <h4>
-                {{.V_Question}}
-            </h4>
-            <div class = "response">
-                {{range $i, $a := .V_Response_ID}}
-                <div>
-                    <label 
-        
-                    {{ if (index $q.V_isCorrrect $i)}} 
-                        class = "green"
-                    {{end}}
+              
+                <h4>
+                    {{.V_Question}}
+                </h4>
 
-                    {{ if and (not (index $q.V_isCorrrect $i)) (index $q.Selected $i)}} 
-                        class ="red"
-                    {{end}}
+                <div class = "response">
+                    {{range $i, $a := .V_Response_ID}}
+                    <div>
+                        <label 
+                            {{ if (index $q.V_isCorrrect $i)}} 
+                                class = "green"
+                            {{end}}
 
-                    for="{{ index $q.V_Response_ID $i }}">
-                        <input type="radio" value="{{ index $q.V_Response_ID $i}}" id="{{ index $q.V_Response_ID $i}}" name="{{ $q.V_Question_ID}}" required {{ if (index $q.Selected $i)}} checked {{end}}/>
-                        {{ index $q.V_Answer $i}} 
-                        {{ if and (index $q.V_isCorrrect $i) (index $q.Selected $i)}}✓{{end}}
-                    </label> 
+                            {{ if and (not (index $q.V_isCorrrect $i)) (index $q.Selected $i)}} 
+                                class ="red"
+                            {{end}}
+                            for="{{ index $q.V_Response_ID $i }}"
+                        >
+                            <input class="questionOption" type="radio" value="{{ index $q.V_Response_ID $i}}" id="{{ index $q.V_Response_ID $i}}" name="{{ $q.V_Question_ID}}" required {{ if (index $q.Selected $i)}} checked {{end}}/>
+                            {{ index $q.V_Answer $i}} 
+                            {{ if and (index $q.V_isCorrrect $i) (index $q.Selected $i)}}✓{{end}}
+                        </label> 
+                    </div>
+                    {{end}}
                 </div>
-                {{end}}
-            </div>
+
             {{end}}
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const els = document.querySelectorAll(".questionOption")
+
+            for (const el of els) {
+              el.addEventListener("click", (e) => e.preventDefault());
+            }
+        });
+    </script>
     
     {{template "layouts/footer" .}}
 
